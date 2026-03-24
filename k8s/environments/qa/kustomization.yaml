@@ -1,0 +1,3 @@
+resources:
+  - ../../namespaces/qa.yaml
+  - ../../apps/my-app

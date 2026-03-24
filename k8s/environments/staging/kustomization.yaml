@@ -1,0 +1,3 @@
+resources:
+  - ../../namespaces/staging.yaml
+  - ../../apps/my-app
