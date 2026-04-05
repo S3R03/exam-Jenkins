@@ -60,3 +60,13 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the labels for the databases  
+*/}}
+{{- define "fastapiapp.dbLabels" -}}
+{{- include "fastapiapp.selectorLabels" . }}
+component: database
+{{- end }}
+
+

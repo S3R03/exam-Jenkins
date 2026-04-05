@@ -10,6 +10,12 @@ app = FastAPI(openapi_url="/api/v1/casts/openapi.json", docs_url="/api/v1/casts/
 async def startup():
     await database.connect()
 
+# Health check endpoint for Kubernetes probes
+
+@app.get("/api/v1/checkapi")
+async def health_check():
+    return {"message": "fastapi is working!"}
+
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()

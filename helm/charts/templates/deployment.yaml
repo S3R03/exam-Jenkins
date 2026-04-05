@@ -33,9 +33,31 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ printf "%s-db-configmap" .Release.Name | quote }}
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ printf "%s-db-configmap" .Release.Name | quote }}
+                  key: POSTGRES_DB
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ printf "%s-db-secret" .Release.Name | quote }}
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URI
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@{{ .Release.Name }}-db-svc/$(POSTGRES_DB)"
+            {{- if .Values.env.castServiceName }}
+            - name: CAST_SERVICE_HOST_URL
+              value: {{ printf "http://%s:8000/api/v1/casts/" .Values.env.castServiceName | quote }}
+            {{- end }}        
           ports:
             - name: http
-              containerPort: 8000
+              containerPort: {{ .Values.env.containerPort }}
               protocol: TCP
           livenessProbe:
             httpGet:

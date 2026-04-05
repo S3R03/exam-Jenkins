@@ -1,0 +1,33 @@
+# ============================================
+# values-cast.yaml
+# Configuration for the cast-service microservice
+# ============================================
+
+# Docker image
+image:
+  repository: reasg/jenkins_for_devops_cast_service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Deployment environment variables
+env:
+  containerPort: 8000
+  castServiceName: ""
+
+# Microservice Kubernetes Service
+service:
+  # this name must match castServiceName in values-movie.yaml
+  name: "cast-service-svc"   
+  nodePort: ""
+
+db:
+  image: postgres:12.1-alpine
+  mountPath: /var/lib/postgresql/data/
+  storage: 1G  # Increase in production (e.g. 50G)
+
+# ConfigMap variables (non-sensitive)
+configMap:
+  POSTGRES_DB: cast_db_dev
+  POSTGRES_USER: cast_db_username
+
+

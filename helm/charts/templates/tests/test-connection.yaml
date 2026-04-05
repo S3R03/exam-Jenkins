@@ -11,5 +11,10 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
+      {{- if empty .Values.service.name }}
       args: ['{{ include "fastapiapp.fullname" . }}:{{ .Values.service.port }}/api/v1/checkapi']
+      {{- else }}
+      args: ['{{ .Values.service.name }}:{{ .Values.service.port }}/api/v1/checkapi']
+      {{- end }}
   restartPolicy: Never
+ 

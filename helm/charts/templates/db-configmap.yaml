@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: {{ .Values.configMap.POSTGRES_DB }}
+  POSTGRES_USER: {{ .Values.configMap.POSTGRES_USER }}
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-db-configmap" .Release.Name | quote }}
+  # doit matcher le configMapKeyRef.name de db.yaml

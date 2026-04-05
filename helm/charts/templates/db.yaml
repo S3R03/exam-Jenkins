@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "fastapiapp.fullname" . }}-db
+  labels: 
+    {{- include "fastapiapp.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+        {{- include "fastapiapp.dbLabels" . | nindent 6 }}     
+         # has to match .spec.template.metadata.labels
+  serviceName: {{ .Release.Name }}-db
+  template:
+    metadata:
+      labels:
+        {{- include "fastapiapp.dbLabels" . | nindent 8 }}
+            # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: {{ .Release.Name }}-postgres
+        image: {{ .Values.db.image }}
+        ports:
+          - containerPort: 5432
+        env: 
+          - name: POSTGRES_USER
+            valueFrom: 
+              configMapKeyRef:
+                name: {{ printf "%s-db-configmap" .Release.Name | quote }}
+                key: POSTGRES_USER
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: {{ printf "%s-db-configmap" .Release.Name | quote }}
+                key: POSTGRES_DB
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ printf "%s-db-secret" .Release.Name | quote }}
+                key: POSTGRES_PASSWORD
+        volumeMounts:
+          - name: volume-{{ .Release.Name }}-db
+            mountPath: {{ .Values.db.mountPath }}
+  volumeClaimTemplates:
+    - metadata:
+        name: volume-{{ .Release.Name }}-db
+      spec:
+        accessModes: ["ReadWriteOnce"] 
+        resources: 
+          requests:
+            storage: {{ .Values.db.storage }}
+
+
+

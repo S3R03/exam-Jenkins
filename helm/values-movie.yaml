@@ -1,0 +1,34 @@
+# ============================================
+# values-movies.yaml
+# Configuration for the movie-service microservice
+# ============================================
+
+# Docker image
+image:
+  repository: reasg/jenkins_for_devops_movie_service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Deployment environment variables
+env:
+  containerPort: 8000
+  # Must match service.name in values-cast.yaml
+  # Run 'kubectl get svc -n dev' to verify the exact service name
+  castServiceName: "cast-service-svc"
+
+# Microservice Kubernetes Service
+service:
+  name: ""
+  nodePort: ""
+
+# PostgreSQL configuration
+db:
+  image: postgres:12.1-alpine
+  mountPath: /var/lib/postgresql/data/
+  storage: 1G  # Increase in production (e.g. 50G)
+
+# ConfigMap variables (non-sensitive)
+configMap:
+  POSTGRES_DB: movie_db_dev
+  POSTGRES_USER: movie_db_username
+

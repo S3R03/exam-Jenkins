@@ -10,9 +10,14 @@ app = FastAPI(openapi_url="/api/v1/movies/openapi.json", docs_url="/api/v1/movie
 async def startup():
     await database.connect()
 
+# Health check endpoint for Kubernetes probes
+
+@app.get("/api/v1/checkapi")
+async def health_check():
+    return {"message": "fastapi is working!"}
+
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-
 
 app.include_router(movies, prefix='/api/v1/movies', tags=['movies'])
