@@ -63,7 +63,7 @@ stages {
       script {
       sh '''
         curl -f localhost:8001/api/v1/movies/openapi.json
-        curl -f localhost:8002/api/v1/movies/openapi.json
+        curl -f localhost:8002/api/v1/casts/openapi.json
       '''
       }
     }
