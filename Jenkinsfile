@@ -62,8 +62,8 @@ stages {
     steps {
       script {
       sh '''
-        curl -f localhost:8001/api/checkapi
-        curl -f localhost:8002/api/checkapi
+        curl -f localhost:8001/api/v1/checkapi
+        curl -f localhost:8002/api//v1/checkapi
       '''
       }
     }
