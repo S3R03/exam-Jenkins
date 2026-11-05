@@ -39,7 +39,9 @@ stages {
         -e POSTGRES_DB=cast_db_dev \
         --network run-net \
         postgres:12.1-alpine
-        
+
+        sleep 10
+
         docker run -d -p 8001:8000 --name movie_service \
         -e DATABASE_URI=postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev \
         -e CAST_SERVICE_HOST_URL=http://cast_service:8000/api/v1/casts/ \
