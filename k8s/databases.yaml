@@ -10,9 +10,13 @@ spec:
     metadata:
       labels: {app: movie-db}
     spec:
+      securityContext:
+        runAsUser: 70
+        appArmorProfile:
+          type: Unconfined
       containers:
         - name: postgres
-          image: postgres:12.1-alpine
+          image: postgres:12-alpine
           env:
             - {name: POSTGRES_USER, value: movie_db_username}
             - {name: POSTGRES_PASSWORD, value: movie_db_password}
@@ -41,9 +45,13 @@ spec:
     metadata:
       labels: {app: cast-db}
     spec:
+      securityContext:
+        runAsUser: 70
+        appArmorProfile:
+          type: Unconfined
       containers:
         - name: postgres
-          image: postgres:12.1-alpine
+          image: postgres:12-alpine
           env:
             - {name: POSTGRES_USER, value: cast_db_username}
             - {name: POSTGRES_PASSWORD, value: cast_db_password}
