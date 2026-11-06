@@ -83,25 +83,31 @@ stages {
       }
     }
   }
-  stage('Deployment in exam-dev'){
-    environment {
-    KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
-    }
-    steps {
-      script {
+stage('Deployment in exam-dev'){
+  environment {
+    KUBECONFIG = credentials("config")
+  }
+  steps {
+    script {
       sh '''
-      rm -Rf ~/.kube
-      mkdir ~/.kube
-      ls
-      cat $KUBECONFIG > ~/.kube/config
-      cp charts/values.yaml values.yml
-      cat values.yml
-      sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-      helm upgrade --install app fastapi --values=values.yml --namespace exam-dev --create-namespace
+        kubectl apply -f k8s/databases.yaml -n exam-dev
+
+        helm upgrade --install cast charts -n exam-dev \
+          --set fullnameOverride=cast \
+          --set image.repository=$DOCKER_ID/$DOCKER_IMAGE_CAST \
+          --set image.tag=$DOCKER_TAG \
+          --set env.DATABASE_URI=postgresql://cast_db_username:cast_db_password@cast-db/cast_db_dev
+
+        helm upgrade --install movie charts -n exam-dev \
+          --set fullnameOverride=movie \
+          --set image.repository=$DOCKER_ID/$DOCKER_IMAGE_MOVIE \
+          --set image.tag=$DOCKER_TAG \
+          --set env.DATABASE_URI=postgresql://movie_db_username:movie_db_password@movie-db/movie_db_dev \
+          --set env.CAST_SERVICE_HOST_URL=http://cast/api/v1/casts/
       '''
-      }
     }
   }
+}
   stage('Deployment in exam-staging'){
     environment {
     KUBECONFIG = credentials("config") // we retrieve  kubeconfig from secret file called config saved on jenkins
@@ -113,7 +119,7 @@ stages {
       mkdir ~/.kube
       ls
       cat $KUBECONFIG > ~/.kube/config
-      cp fastapi/values.yaml values.yml
+      cp charts/values.yaml values.yml
       cat values.yml
       sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
       helm upgrade --install app fastapi --values=values.yml --namespace jenkins-lab-staging --create-namespace
@@ -137,7 +143,7 @@ stages {
           mkdir ~/.kube
           ls
           cat $KUBECONFIG > ~/.kube/config
-          cp fastapi/values.yaml values.yml
+          cp charts/values.yaml values.yml
           cat values.yml
           sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
           helm upgrade --install app fastapi --values=values.yml --namespace jenkins-lab-prod --create-namespace
